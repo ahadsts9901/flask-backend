@@ -6,7 +6,7 @@
 - done                === >          crud with variable
 - done                === >          crud with mongodb with filters
 - done                === >          crud with mongodb with classes, schema & filters
-- in_progress         === >          crud with my sql with filters
+- done                === >          crud with sqlite3 with filters
 - in_progress         === >          crud with my sql with filters
 - in_progress         === >          crud with my sql & sequilize with filters
 - done                === >          file upload to firebase
