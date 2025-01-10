@@ -41,7 +41,30 @@ class User(Document):
 # login
 @app.route("/api/v1/login", methods=["POST"])
 def login():
-    return jsonify({"message": "login successfully", "data": {}}), 200
+    print("hello")
+    data = request.json
+    if not data:
+        return jsonify({"message": "data is required"}), 400
+    if not "username" in data:
+        return jsonify({"message": "username is required"}), 400
+
+    if not "password" in data:
+        return jsonify({"message": "password is required"}), 400
+
+    username = data["username"]
+    password = data["password"]
+
+    user_exist = User.objects(username=username).first()
+    if not user_exist:
+        return jsonify({"message": "username or password incorrect"}), 400
+
+    is_password_correct = bcrypt.checkpw(password.encode("utf-8"), user_exist["password"].encode("utf-8"))
+    
+    if not is_password_correct:
+        return jsonify({"message": "username or password incorrect"}), 400
+
+
+    return jsonify({"message": "login successful"}), 200
 
 
 
