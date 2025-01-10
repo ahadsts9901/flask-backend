@@ -1,8 +1,10 @@
 import os
+import bcrypt
 from flask import Flask, request, jsonify
 from mongoengine import connect, Document, StringField, BooleanField, DateTimeField
 from datetime import datetime
 from dotenv import load_dotenv
+from functions import upload_profile_picture
 
 load_dotenv()
 
@@ -19,8 +21,7 @@ connect("jwt_flask_python", host=mongo_url)
 # Define the User schema
 class User(Document):
     username = StringField(required=True, unique=True)
-    password = BooleanField(default=False)
-    email = StringField(required=True,unique=True)
+    password = StringField(required=True)
     profile_picture = StringField(required=True)
     created_at = DateTimeField(default=datetime.utcnow)
     updated_at = DateTimeField(default=datetime.utcnow)
@@ -30,7 +31,6 @@ class User(Document):
             "id": str(self.id),
             "username": self.username,
             "password": self.password,
-            "email": self.email,
             "profile_picture": self.profile_picture,
             "created_at": self.created_at,
             "updated_at": self.updated_at
@@ -48,14 +48,44 @@ def login():
 # signup
 @app.route("/api/v1/signup", methods=["POST"])
 def signup():
-    return jsonify({"message": "signup successfully", "data": {}}), 200
+    if not request.form or not request.files:
+        return jsonify({"message": "Form data and file are required"}), 400
 
+    username = request.form.get("username")
+    password = request.form.get("password")
+    profile_picture = request.files.get("file")
+
+    if not username:
+        return jsonify({"message": "username is required"}), 400
+    if not password:
+        return jsonify({"message": "password is required"}), 400
+    if not profile_picture:
+        return jsonify({"message": "profile picture is required"}), 400
+
+    user_exist = User.objects(username=username).first()
+    if user_exist:
+        return jsonify({"message": "username already taken"}), 400
+
+    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    password = hashed_password.decode("utf-8")
+    profile_url = upload_profile_picture(profile_picture)
+
+    new_user = User(
+        username=username,
+        password=password,
+        profile_picture=str(profile_url["url"]),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    new_user.save()
+
+    return jsonify({"message": "signup successful"}), 200
 
 
 # logout
 @app.route("/api/v1/logout", methods=["POST"])
 def logout():
-    return jsonify({"message": "signup successfully", "data": {}}), 200
+    return jsonify({"message": "logout successfully", "data": {}}), 200
 
 
 
