@@ -45,17 +45,16 @@ def login():
 
 
 
-
 # signup
 @app.route("/api/v1/signup", methods=["POST"])
-def login():
+def signup():
     return jsonify({"message": "signup successfully", "data": {}}), 200
 
 
 
 # logout
-@app.route("/api/v1/signup", methods=["POST"])
-def login():
+@app.route("/api/v1/logout", methods=["POST"])
+def logout():
     return jsonify({"message": "signup successfully", "data": {}}), 200
 
 
@@ -78,7 +77,6 @@ def get_user_profile(user_id):
 @app.route("/api/v1/protected", methods=["GET"])
 def protected():
     return jsonify({"message": "protected route fetched", "data": {}}), 404
-
 
 
 
