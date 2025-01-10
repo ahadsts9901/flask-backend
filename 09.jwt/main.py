@@ -1,6 +1,8 @@
 import os
 import bcrypt
-from flask import Flask, request, jsonify
+import jwt
+from flask import Flask, request, jsonify, make_response
+from datetime import datetime, timedelta
 from mongoengine import connect, Document, StringField, BooleanField, DateTimeField
 from datetime import datetime
 from dotenv import load_dotenv
@@ -63,8 +65,26 @@ def login():
     if not is_password_correct:
         return jsonify({"message": "username or password incorrect"}), 400
 
+    payload = {
+        "id": str(user_exist["id"]),
+        "username": user_exist["username"],
+        "exp": datetime.utcnow() + timedelta(hours=1)  # Token expiry in 1 hour
+    }
 
-    return jsonify({"message": "login successful"}), 200
+    # Generate JWT token
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+    # Create response and set JWT in cookies
+    response = make_response(jsonify({"message": "login successful"}))
+    response.set_cookie(
+        "hart", 
+        token, 
+        httponly=True,  # Make the cookie inaccessible via JavaScript
+        secure=True,    # Use secure flag for HTTPS
+        samesite="Strict"  # Prevent CSRF attacks
+    )
+    
+    return response
 
 
 
@@ -103,6 +123,8 @@ def signup():
     new_user.save()
 
     return jsonify({"message": "signup successful"}), 200
+
+
 
 
 # logout
