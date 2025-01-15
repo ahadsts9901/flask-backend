@@ -13,6 +13,8 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 
+JWT_KEY = os.getenv("JWT_KEY")
+
 # MongoDB connection setup using MongoEngine
 mongo_url = os.getenv("MONGO_URI")
 if not mongo_url:
@@ -40,10 +42,10 @@ class User(Document):
 
 
 
+
 # login
 @app.route("/api/v1/login", methods=["POST"])
 def login():
-    print("hello")
     data = request.json
     if not data:
         return jsonify({"message": "data is required"}), 400
@@ -71,20 +73,17 @@ def login():
         "exp": datetime.utcnow() + timedelta(hours=1)  # Token expiry in 1 hour
     }
 
-    # Generate JWT token
-    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-
-    # Create response and set JWT in cookies
+    token = jwt.encode(payload, JWT_KEY, algorithm="HS256")
     response = make_response(jsonify({"message": "login successful"}))
     response.set_cookie(
         "hart", 
         token, 
-        httponly=True,  # Make the cookie inaccessible via JavaScript
-        secure=True,    # Use secure flag for HTTPS
-        samesite="Strict"  # Prevent CSRF attacks
+        httponly=True,
+        secure=True,
     )
     
     return response
+
 
 
 
