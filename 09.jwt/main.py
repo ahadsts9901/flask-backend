@@ -4,25 +4,23 @@ import jwt
 from flask import Flask, request, jsonify, make_response
 from datetime import datetime, timedelta
 from mongoengine import connect, Document, StringField, BooleanField, DateTimeField
-from datetime import datetime
 from dotenv import load_dotenv
-from functions import upload_profile_picture
+from functions import upload_profile_picture, jwt_required
 
 load_dotenv()
 
-# Initialize Flask app
 app = Flask(__name__)
 
 JWT_KEY = os.getenv("JWT_KEY")
 
-# MongoDB connection setup using MongoEngine
+# connect to mongodb
 mongo_url = os.getenv("MONGO_URI")
 if not mongo_url:
     raise ValueError("mongo_uri environment variable not set")
 
 connect("jwt_flask_python", host=mongo_url)
 
-# Define the User schema
+# user schema
 class User(Document):
     username = StringField(required=True, unique=True)
     password = StringField(required=True)
@@ -40,121 +38,120 @@ class User(Document):
             "updated_at": self.updated_at
         }
 
-
-
-
-# login
+# login route
 @app.route("/api/v1/login", methods=["POST"])
 def login():
-    data = request.json
-    if not data:
-        return jsonify({"message": "data is required"}), 400
-    if not "username" in data:
-        return jsonify({"message": "username is required"}), 400
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"message": "data is required"}), 400
+        if "username" not in data or "password" not in data:
+            return jsonify({"message": "username and password are required"}), 400
 
-    if not "password" in data:
-        return jsonify({"message": "password is required"}), 400
+        username = data["username"]
+        password = data["password"]
 
-    username = data["username"]
-    password = data["password"]
+        user = User.objects(username=username).first()
+        if not user:
+            return jsonify({"message": "username or password incorrect"}), 400
 
-    user_exist = User.objects(username=username).first()
-    if not user_exist:
-        return jsonify({"message": "username or password incorrect"}), 400
+        if not bcrypt.checkpw(password.encode("utf-8"), user.password.encode("utf-8")):
+            return jsonify({"message": "username or password incorrect"}), 400
 
-    is_password_correct = bcrypt.checkpw(password.encode("utf-8"), user_exist["password"].encode("utf-8"))
-    
-    if not is_password_correct:
-        return jsonify({"message": "username or password incorrect"}), 400
+        payload = {
+            "id": str(user.id),
+            "username": user.username,
+            "exp": datetime.utcnow() + timedelta(hours=1)
+        }
 
-    payload = {
-        "id": str(user_exist["id"]),
-        "username": user_exist["username"],
-        "exp": datetime.utcnow() + timedelta(hours=1)  # Token expiry in 1 hour
-    }
+        token = jwt.encode(payload, JWT_KEY, algorithm="HS256")
+        response = make_response(jsonify({"message": "login successful"}))
+        response.set_cookie("hart", token, httponly=True, secure=True)
+        return response
 
-    token = jwt.encode(payload, JWT_KEY, algorithm="HS256")
-    response = make_response(jsonify({"message": "login successful"}))
-    response.set_cookie(
-        "hart", 
-        token, 
-        httponly=True,
-        secure=True,
-    )
-    
-    return response
+    except Exception as e:
+        return jsonify({"message": "internal server error", "error": str(e)}), 500
 
-
-
-
-# signup
+# signup route
 @app.route("/api/v1/signup", methods=["POST"])
 def signup():
-    if not request.form or not request.files:
-        return jsonify({"message": "Form data and file are required"}), 400
+    try:
+        if not request.form or not request.files:
+            return jsonify({"message": "form data and file are required"}), 400
 
-    username = request.form.get("username")
-    password = request.form.get("password")
-    profile_picture = request.files.get("file")
+        username = request.form.get("username")
+        password = request.form.get("password")
+        profile_picture = request.files.get("file")
 
-    if not username:
-        return jsonify({"message": "username is required"}), 400
-    if not password:
-        return jsonify({"message": "password is required"}), 400
-    if not profile_picture:
-        return jsonify({"message": "profile picture is required"}), 400
+        if not username or not password or not profile_picture:
+            return jsonify({"message": "all fields are required"}), 400
 
-    user_exist = User.objects(username=username).first()
-    if user_exist:
-        return jsonify({"message": "username already taken"}), 400
+        if User.objects(username=username).first():
+            return jsonify({"message": "username already taken"}), 400
 
-    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-    password = hashed_password.decode("utf-8")
-    profile_url = upload_profile_picture(profile_picture)
+        hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        profile_url = upload_profile_picture(profile_picture)
 
-    new_user = User(
-        username=username,
-        password=password,
-        profile_picture=str(profile_url["url"]),
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
-    )
-    new_user.save()
+        new_user = User(
+            username=username,
+            password=hashed_password,
+            profile_picture=profile_url["url"],
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+        )
+        new_user.save()
 
-    return jsonify({"message": "signup successful"}), 200
+        return jsonify({"message": "signup successful"}), 200
 
+    except Exception as e:
+        return jsonify({"message": "internal server error", "error": str(e)}), 500
 
-
-
-# logout
+# logout route
 @app.route("/api/v1/logout", methods=["POST"])
 def logout():
-    return jsonify({"message": "logout successfully", "data": {}}), 200
+    try:
+        response = make_response(jsonify({"message": "logout successful"}))
+        response.delete_cookie("hart")
+        return response
+    except Exception as e:
+        return jsonify({"message": "internal server error", "error": str(e)}), 500
 
-
-
-# get current user profile
+# get current user profile route
 @app.route("/api/v1/profile", methods=["GET"])
-def get_current_user_profile(): 
-    return jsonify({"message": "current user profile fetched", "data": {}}), 200
+@jwt_required
+def get_current_user_profile():
+    try:
+        user_id = request.current_user["id"]
+        user = User.objects(id=user_id).first()
+        if not user:
+            return jsonify({"message": "user not found"}), 404
 
+        return jsonify({
+            "message": "current user profile fetched",
+            "data": {
+                "id": str(user.id),
+                "username": user.username,
+                "profile_picture": user.profile_picture,
+                "created_at": user.created_at,
+                "updated_at": user.updated_at,
+            }
+        }), 200
 
+    except jwt.ExpiredSignatureError:
+        return jsonify({"message": "token has expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"message": "invalid token"}), 401
+    except Exception as e:
+        return jsonify({"message": "internal server error", "error": str(e)}), 500
 
-# get user profile
-@app.route("/api/v1/profile/<string:user_id>", methods=["GET"])
-def get_user_profile(user_id):
-    return jsonify({"message": "user profile fetched", "data": {}}), 404
-
-
-
-# protected_route
+# protected route
 @app.route("/api/v1/protected", methods=["GET"])
+@jwt_required
 def protected():
-    return jsonify({"message": "protected route fetched", "data": {}}), 404
-
-
+    try:
+        return jsonify({"message": "protected route accessed"}), 200
+    except Exception as e:
+        return jsonify({"message": "internal server error", "error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
