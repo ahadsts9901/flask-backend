@@ -31,7 +31,7 @@ def role_required(role):
             if hasattr(request, 'current_user'):
                 user = User.objects(id=request.current_user['id']).first()
                 if user and user.role != role:
-                    return jsonify({'message': 'forbidden'}), 403
+                    return jsonify({'message': 'only admins are allowed'}), 403
             return f(*args, **kwargs)
         return wrapped_function
     return wrapper
