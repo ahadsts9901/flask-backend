@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, make_response
-from models import User
+from .models import User
 import bcrypt
 import jwt
 from datetime import datetime, timedelta

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
-from middleware import jwt_required, role_required
-from models import User
+from .middleware import jwt_required, role_required
+from .models import User
 
 admin_bp = Blueprint('admin', __name__)
 

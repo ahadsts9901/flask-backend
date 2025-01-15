@@ -1,7 +1,7 @@
 from flask import Flask
-from auth_routes import auth_bp
-from user_routes import user_bp
-from admin_routes import admin_bp
+from .auth_routes import auth_bp
+from .user_routes import user_bp
+from .admin_routes import admin_bp
 
 def create_app():
     app = Flask(__name__)
