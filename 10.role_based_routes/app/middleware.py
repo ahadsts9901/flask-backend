@@ -1,8 +1,8 @@
 import jwt
 from functools import wraps
 from flask import request, jsonify
-from .models import User
-from .config import JWT_KEY
+from models import User
+from config import JWT_KEY
 
 # JWT authentication middleware
 def jwt_required(f):

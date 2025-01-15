@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from .middleware import jwt_required
-from .models import User
+from middleware import jwt_required
+from models import User
 
 user_bp = Blueprint('user', __name__)
 

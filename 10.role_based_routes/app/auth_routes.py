@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify, make_response
-from .models import User
+from models import User
 import bcrypt
 import jwt
 from datetime import datetime, timedelta
-from .config import JWT_KEY
+from config import JWT_KEY
 
 auth_bp = Blueprint('auth', __name__)
 
