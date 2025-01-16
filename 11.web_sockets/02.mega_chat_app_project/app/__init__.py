@@ -9,11 +9,11 @@ from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    CORS(app,supports_credentials=True)
 
     if not MONGO_URI:
         raise ValueError("mongo_uri environment variable not set")
-    connect("roles_pflask_schema", host=MONGO_URI)
+    connect("flask_chat_app", host=MONGO_URI)
 
     # Register blueprints for different routes
     app.register_blueprint(auth_bp, url_prefix='/api/v1')
