@@ -36,8 +36,8 @@ const Chat = ({ userId }: any) => {
 
     socket.on('connect', () => {
       console.log('connected');
-      const currentUserId = currentUser?.id;
-      socket.emit('join', { user_id: currentUserId });
+      // const currentUserId = currentUser?.id;
+      // socket.emit('join', { user_id: currentUserId });
     });
 
     socket.on('disconnect', (message) => {

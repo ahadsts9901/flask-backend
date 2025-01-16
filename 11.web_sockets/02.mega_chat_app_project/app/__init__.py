@@ -6,6 +6,7 @@ from .profile_routes import profile_bp
 from .chat_routes import chat_bp
 from config import MONGO_URI
 from flask_cors import CORS
+from extensions import socketio
 
 def create_app():
     app = Flask(__name__)
@@ -20,5 +21,6 @@ def create_app():
     app.register_blueprint(users_bp, url_prefix='/api/v1')
     app.register_blueprint(profile_bp, url_prefix='/api/v1')
     app.register_blueprint(chat_bp, url_prefix='/api/v1')
+    socketio.init_app(app)
 
     return app

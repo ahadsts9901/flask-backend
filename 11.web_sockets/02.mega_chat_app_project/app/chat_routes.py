@@ -2,8 +2,7 @@ from flask import Blueprint, jsonify, request
 from .middleware import jwt_required
 from .models import Chat
 from datetime import datetime
-from flask_socketio import emit, SocketIO
-# from run import socketio
+from extensions import socketio
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -38,11 +37,11 @@ def create_message():
             "from_id": new_message.from_id,
             "to_id": new_message.to_id,
             "text": new_message.text,
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
+            "created_at": new_message.created_at.isoformat(),
+            "updated_at": new_message.updated_at.isoformat()
         }
 
-        socketio.emit(f'chat-message-{to_id}', message_data, room=f'message-{to_id}')
+        socketio.emit(f'chat-message-{to_id}', message_data)
         return jsonify({'message': 'message sent successfully', "data": message_data}), 200
     except Exception as e:
         print(str(e))
@@ -114,32 +113,8 @@ def delete_message(message_id):
 
         # Emit delete event to the user (dynamic room)
         room = f'message-{message.to_id}'
-        emit(f'delete-chat-message-{message.to_id}', {'deletedMessageId': message_id}, room=room)
+        socketio.emit(f'delete-chat-message-{message.to_id}', {'deletedMessageId': message_id})
 
         return jsonify({'message': 'message deleted successfully'}), 200
     except Exception as e:
         return jsonify({"message": "internal server error", "error": str(e)}), 500
-
-# @socketio.on('join')
-# def on_join(data):
-#     user_id = data.get('user_id')
-#     if user_id:
-#         room = f'message-{user_id}'
-#         join_room(room)
-#         emit('status', {'message': f'User {user_id} has joined {room}.'}, to=room)
-
-
-# frontend code:
-
-# const socket = io("http://localhost:5000");
-
-# // Join the dynamic channel (e.g., message-<userID>)
-# socket.on("connect", () => {
-#   const currentUserId = "123"; // Replace with the actual user ID
-#   socket.emit("join", { user_id: currentUserId });
-# });
-
-# // Listen for new messages on the dynamic channel
-# socket.on(`message-${currentUserId}`, (message) => {
-#   console.log("New message received:", message);
-# });
