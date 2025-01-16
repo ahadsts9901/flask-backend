@@ -3,7 +3,7 @@ from .middleware import jwt_required
 from .models import Chat
 from datetime import datetime
 from flask_socketio import emit ,join_room
-from run import socketio
+# from run import socketio
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -116,13 +116,13 @@ def delete_message(message_id):
         return jsonify({"message": "internal server error", "error": str(e)}), 500
 
 
-@socketio.on('join')
-def on_join(data):
-    user_id = data.get('user_id')
-    if user_id:
-        room = f'message-{user_id}'
-        join_room(room)
-        emit('status', {'message': f'User {user_id} has joined {room}.'}, to=room)
+# @socketio.on('join')
+# def on_join(data):
+#     user_id = data.get('user_id')
+#     if user_id:
+#         room = f'message-{user_id}'
+#         join_room(room)
+#         emit('status', {'message': f'User {user_id} has joined {room}.'}, to=room)
 
 
 # frontend code:

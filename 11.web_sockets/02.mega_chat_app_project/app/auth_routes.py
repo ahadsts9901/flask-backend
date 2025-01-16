@@ -11,6 +11,7 @@ auth_bp = Blueprint('auth', __name__)
 # Google login route
 @auth_bp.route('/google-login', methods=['POST'])
 def google_login():
+    print("hello world")
     try:
         data = request.json
         if not data or 'access_token' not in data:

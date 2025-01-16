@@ -33,7 +33,7 @@ def get_current_user_profile():
 # Get dynamic user profile
 @profile_bp.route('/profile/<string:user_id>', methods=['GET'])
 @jwt_required
-def get_current_user_profile(user_id):
+def get_dynamic_user_profile(user_id):
     try:
         user = User.objects(id=user_id).first()
         if not user:
