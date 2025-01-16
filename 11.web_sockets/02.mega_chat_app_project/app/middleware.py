@@ -14,8 +14,6 @@ def jwt_required(f):
         try:
             # Corrected this line to use a list for the algorithms parameter
             payload = jwt.decode(token, JWT_KEY, algorithms=["HS256"])
-            print("payload")
-            print(payload)
             request.current_user = payload
         except jwt.ExpiredSignatureError as je:
             print(str(je))

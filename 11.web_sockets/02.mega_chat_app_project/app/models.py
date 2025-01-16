@@ -21,7 +21,6 @@ class User(Document):
 
 
 class Chat(Document):
-    id = StringField(required=True)
     from_id = StringField(required=True)
     to_id = StringField(required=True)
     text = StringField(required=True)

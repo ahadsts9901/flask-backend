@@ -27,7 +27,7 @@ def create_message():
         new_message = Chat(
             from_id=from_id,
             to_id=to_id,
-            message=message,
+            text=message,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow()
         )
@@ -37,15 +37,16 @@ def create_message():
             "id": str(new_message.id),
             "from_id": new_message.from_id,
             "to_id": new_message.to_id,
-            "message": new_message.message,
+            "text": new_message.text,
             "created_at": new_message.created_at,
             "updated_at": new_message.updated_at
         }
 
-        emit(f'message-{to_id}', message_data, to=f'message-{to_id}')
+        # emit(f'message-{to_id}', message_data, to=f'message-{to_id}')
 
         return jsonify({'message': 'message sent successfully', "data": message_data}), 200
     except Exception as e:
+        print(str(e))
         return jsonify({"message": "internal server error", "error": str(e)}), 500
 
 # Get messages
@@ -54,7 +55,6 @@ def create_message():
 def get_messages(to_id):
     try:
         from_id = request.current_user["id"]
-
         messages = Chat.objects(
             __raw__={
                 "$or": [
@@ -62,14 +62,14 @@ def get_messages(to_id):
                     {"from_id": to_id, "to_id": from_id}
                 ]
             }
-        ).order_by('created_at')
+        ).order_by('-created_at')
 
         messages_list = [
             {
                 "id": str(msg.id),
                 "from_id": msg.from_id,
                 "to_id": msg.to_id,
-                "message": msg.message,
+                "text": msg.text,
                 "created_at": msg.created_at,
                 "updated_at": msg.updated_at
             }
