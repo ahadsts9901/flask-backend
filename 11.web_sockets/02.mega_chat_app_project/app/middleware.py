@@ -8,17 +8,20 @@ def jwt_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.cookies.get('hart')
-        print("token")
-        print(token)
         if not token:
             return jsonify({'message': 'unauthorized'}), 401
 
         try:
+            # Corrected this line to use a list for the algorithms parameter
             payload = jwt.decode(token, JWT_KEY, algorithms=["HS256"])
-            request.current_user = payload  # Attach the payload to request
-        except jwt.ExpiredSignatureError:
+            print("payload")
+            print(payload)
+            request.current_user = payload
+        except jwt.ExpiredSignatureError as je:
+            print(str(je))
             return jsonify({'message': 'token has expired'}), 401
-        except jwt.InvalidTokenError:
+        except jwt.InvalidTokenError as ie:
+            print(str(ie))
             return jsonify({'message': 'invalid token'}), 401
 
         return f(*args, **kwargs)

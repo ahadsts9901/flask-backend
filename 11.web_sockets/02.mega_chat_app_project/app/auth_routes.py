@@ -46,7 +46,7 @@ def google_login():
                 'profile_picture': new_user.profile_picture,
                 'created_at': new_user.created_at.isoformat(), 
                 'updated_at': new_user.updated_at.isoformat(), 
-                'exp': (datetime.utcnow() + timedelta(hours=1)).isoformat() 
+                'exp': (datetime.utcnow() + timedelta(days=1)).timestamp()
             }
 
             token = jwt.encode(payload, JWT_KEY, algorithm="HS256")
@@ -63,7 +63,7 @@ def google_login():
                 'profile_picture': user.profile_picture,
                 'created_at': user.created_at.isoformat(),
                 'updated_at': user.updated_at.isoformat(),
-                'exp': (datetime.utcnow() + timedelta(hours=1)).isoformat()
+                'exp': (datetime.utcnow() + timedelta(days=1)).timestamp()
             }
 
             token = jwt.encode(payload, JWT_KEY, algorithm="HS256")
