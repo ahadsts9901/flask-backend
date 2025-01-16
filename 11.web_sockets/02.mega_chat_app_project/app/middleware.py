@@ -8,6 +8,8 @@ def jwt_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.cookies.get('hart')
+        print("token")
+        print(token)
         if not token:
             return jsonify({'message': 'unauthorized'}), 401
 

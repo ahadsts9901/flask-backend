@@ -51,7 +51,7 @@ def google_login():
 
             token = jwt.encode(payload, JWT_KEY, algorithm="HS256")
             response = make_response(jsonify({'message': 'google login successful'}))
-            response.set_cookie('hart', token, httponly=True, secure=True)
+            response.set_cookie('hart', token, httponly=True, secure=True,samesite="None")
 
             return response
 
@@ -68,7 +68,7 @@ def google_login():
 
             token = jwt.encode(payload, JWT_KEY, algorithm="HS256")
             response = make_response(jsonify({'message': 'google login successful'}))
-            response.set_cookie('hart', token, httponly=True, secure=True)
+            response.set_cookie('hart', token, httponly=True, secure=True,samesite="None")
 
             return response
 
