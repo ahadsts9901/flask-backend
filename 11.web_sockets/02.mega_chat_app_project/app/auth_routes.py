@@ -35,7 +35,7 @@ def login():
 
         return response
     except Exception as e:
-        return jsonify({'message': 'interna server error', "error":str(e.message)}), 500
+        return jsonify({'message': 'interna server error', "error":str(e)}), 500
 
 
 # Signup route
@@ -69,4 +69,15 @@ def signup():
 
         return jsonify({'message': 'signup successful'}), 200
     except Exception as e:
-        return jsonify({'message': 'interna server error', "error":str(e.message)}), 400
+        return jsonify({'message': 'interna server error', "error":str(e)}), 500
+    
+
+# Logout route
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    try:
+        response = make_response(jsonify({"message": "logout successful"}))
+        response.delete_cookie("hart")
+        return response
+    except Exception as e:
+        return jsonify({"message": "internal server error", "error": str(e)}), 500
