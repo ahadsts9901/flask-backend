@@ -19,6 +19,7 @@ def get_current_user_profile():
             'data': {
                 'id': str(user.id),
                 'username': user.username,
+                'email': user.email,
                 'profile_picture': user.profile_picture,
                 'created_at': user.created_at,
                 'updated_at': user.updated_at
@@ -43,6 +44,7 @@ def get_current_user_profile(user_id):
             'data': {
                 'id': str(user.id),
                 'username': user.username,
+                'email': user.email,
                 'profile_picture': user.profile_picture,
                 'created_at': user.created_at,
                 'updated_at': user.updated_at
