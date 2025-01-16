@@ -2,7 +2,7 @@ from app import create_app
 from flask_socketio import SocketIO, join_room, emit
 
 app = create_app()
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins= "*")
 
 @socketio.on('join')
 def on_join(data):

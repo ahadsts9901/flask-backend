@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from .middleware import jwt_required
 from .models import Chat
 from datetime import datetime
-from flask_socketio import emit
+from flask_socketio import emit, SocketIO
 # from run import socketio
 
 chat_bp = Blueprint('chat', __name__)
@@ -42,7 +42,7 @@ def create_message():
             "updated_at": datetime.utcnow()
         }
 
-        emit(f'chat-message-{to_id}', message_data, room=f'message-{to_id}')
+        socketio.emit(f'chat-message-{to_id}', message_data, room=f'message-{to_id}')
         return jsonify({'message': 'message sent successfully', "data": message_data}), 200
     except Exception as e:
         print(str(e))
