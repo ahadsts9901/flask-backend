@@ -3,6 +3,7 @@ from mongoengine import connect
 from .auth_routes import auth_bp
 from .users_routes import users_bp
 from .profile_routes import profile_bp
+from .chat_routes import chat_bp
 from config import MONGO_URI
 
 def create_app():
@@ -16,5 +17,6 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/api/v1')
     app.register_blueprint(users_bp, url_prefix='/api/v1')
     app.register_blueprint(profile_bp, url_prefix='/api/v1')
+    app.register_blueprint(chat_bp, url_prefix='/api/v1')
 
     return app
