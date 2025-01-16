@@ -136,7 +136,7 @@ const Header = ({ user, showDrop, showBackButton }: any) => {
                 />
                 <h3>
                     {
-                        user?._id === currentUser?._id ? "You" :
+                        user?.id === currentUser?.id ? "You" :
                             user?.userName ? user?.userName : "Chat App"
                     }
                 </h3>

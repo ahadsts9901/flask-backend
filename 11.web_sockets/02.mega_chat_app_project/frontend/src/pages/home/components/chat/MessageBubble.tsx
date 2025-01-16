@@ -24,7 +24,7 @@ export const RightChat = ({ data, setMessages }: any) => {
     return (
         <>
             <div className="rightChatBubble">
-                <ActionsDropdown id={data?._id} setMessages={setMessages} />
+                <ActionsDropdown id={data?.id} setMessages={setMessages} />
                 <p>{data?.text}</p>
                 <TimeAndRead status={data?.status} time={data?.time} />
             </div>
@@ -60,7 +60,7 @@ export const ActionsDropdown = ({ id, setMessages }: any) => {
 
             await axios.delete(`${baseUrl}/api/v1/message/${messageId}`, { withCredentials: true })
 
-            setMessages((messages: any) => messages?.filter((message: any) => message?._id !== messageId))
+            setMessages((messages: any) => messages?.filter((message: any) => message?.id !== messageId))
             setIsLoading(false)
             setShowActionModal(false)
 
@@ -143,7 +143,7 @@ const MessageBubble = ({ message, setMessages }: any) => {
     return (
         <>
             {
-                message?.from_id === currentUser?._id ?
+                message?.from_id === currentUser?.id ?
                     <RightChat data={message} setMessages={setMessages} />
                     :
                     <LeftChat data={message} setMessages={setMessages} />

@@ -11,13 +11,13 @@ const Contact = ({ user }: any) => {
 
     return (
         <>
-            <div className={`contact ${userId === user?._id ? "active-contact" : ""}`} onClick={() => navigate(`/chat/${user?._id}`)}>
+            <div className={`contact ${userId === user?.id ? "active-contact" : ""}`} onClick={() => navigate(`/chat/${user?.id}`)}>
                 <img src={user?.profilePhoto ? user?.profilePhoto : defaultProfilePicture} alt="profile photo"
                     onError={(e: any) => e.target.src = defaultProfilePicture}
                 />
                 <p>
                     {
-                        currentUser?._id === user?._id ? "You" :
+                        currentUser?.id === user?.id ? "You" :
                             user?.userName ? user?.userName : ""
                     }
                 </p>

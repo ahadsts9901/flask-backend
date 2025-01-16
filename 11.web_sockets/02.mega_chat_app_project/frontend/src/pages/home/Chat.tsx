@@ -39,9 +39,9 @@ const Chat = ({ userId }: any) => {
 
     socket.on('disconnect', (message) => console.log("socket disconnected from server: ", message))
 
-    socket.on(`chat-message-${currentUser?._id}`, async (e: any) => setMessages((prev: any) => [e, ...prev]))
+    socket.on(`chat-message-${currentUser?.id}`, async (e: any) => setMessages((prev: any) => [e, ...prev]))
 
-    socket.on(`delete-chat-message-${currentUser?._id}`, async (e: any) => setMessages((oldMessages: any) => oldMessages?.filter((message: any) => message?._id != e?.deletedMessageId)))
+    socket.on(`delete-chat-message-${currentUser?.id}`, async (e: any) => setMessages((oldMessages: any) => oldMessages?.filter((message: any) => message?.id != e?.deletedMessageId)))
 
     return () => socket.close()
 

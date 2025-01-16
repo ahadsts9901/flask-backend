@@ -14,12 +14,12 @@ const ChatForm = ({ user, setMessages }: any) => {
         e?.preventDefault()
 
         if (!text || text?.trim() === "") return
-        if (!user || !user?._id || user?._id?.trim() === "") return
+        if (!user || !user?.id || user?.id?.trim() === "") return
 
         try {
 
             const resp = await axios.post(`${baseUrl}/api/v1/message`, {
-                to_id: user?._id,
+                to_id: user?.id,
                 text: text
             }, { withCredentials: true })
 
