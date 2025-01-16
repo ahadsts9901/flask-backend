@@ -1,7 +1,6 @@
 import jwt
 from functools import wraps
 from flask import request, jsonify
-from .models import User
 from config import JWT_KEY
 
 # JWT authentication middleware
@@ -22,16 +21,3 @@ def jwt_required(f):
 
         return f(*args, **kwargs)
     return decorated_function
-
-# Role-based access control middleware
-def role_required(role):
-    def wrapper(f):
-        @wraps(f)
-        def wrapped_function(*args, **kwargs):
-            if hasattr(request, 'current_user'):
-                user = User.objects(id=request.current_user['id']).first()
-                if user and user.role != role:
-                    return jsonify({'message': 'only admins are allowed'}), 403
-            return f(*args, **kwargs)
-        return wrapped_function
-    return wrapper
