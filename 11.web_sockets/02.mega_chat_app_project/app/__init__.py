@@ -2,7 +2,7 @@ from flask import Flask
 from mongoengine import connect
 from .auth_routes import auth_bp
 from .users_routes import users_bp
-from .admin_routes import admin_bp
+from .profile_routes import profile_bp
 from config import MONGO_URI
 
 def create_app():
@@ -15,6 +15,6 @@ def create_app():
     # Register blueprints for different routes
     app.register_blueprint(auth_bp, url_prefix='/api/v1')
     app.register_blueprint(users_bp, url_prefix='/api/v1')
-    app.register_blueprint(admin_bp, url_prefix='/api/v1/admin')
+    app.register_blueprint(profile_bp, url_prefix='/api/v1')
 
     return app
