@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from .middleware import jwt_required
 from .models import Chat
 from datetime import datetime
-from flask_socketio import emit ,join_room
+from flask_socketio import emit
 # from run import socketio
 
 chat_bp = Blueprint('chat', __name__)
@@ -38,12 +38,11 @@ def create_message():
             "from_id": new_message.from_id,
             "to_id": new_message.to_id,
             "text": new_message.text,
-            "created_at": new_message.created_at,
-            "updated_at": new_message.updated_at
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
         }
 
-        # emit(f'message-{to_id}', message_data, to=f'message-{to_id}')
-
+        emit(f'chat-message-{to_id}', message_data, room=f'message-{to_id}')
         return jsonify({'message': 'message sent successfully', "data": message_data}), 200
     except Exception as e:
         print(str(e))
@@ -106,15 +105,20 @@ def edit_message(message_id):
 @jwt_required
 def delete_message(message_id):
     try:
-        message = Chat.objects(id=message_id,)
+        message = Chat.objects(id=message_id, from_id=request.current_user["id"]).first()
         if not message:
             return jsonify({"message": "message not found or unauthorized"}), 404
+        
+        message_id = str(message.id)
         message.delete()
+
+        # Emit delete event to the user (dynamic room)
+        room = f'message-{message.to_id}'
+        emit(f'delete-chat-message-{message.to_id}', {'deletedMessageId': message_id}, room=room)
 
         return jsonify({'message': 'message deleted successfully'}), 200
     except Exception as e:
         return jsonify({"message": "internal server error", "error": str(e)}), 500
-
 
 # @socketio.on('join')
 # def on_join(data):

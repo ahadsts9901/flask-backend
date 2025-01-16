@@ -32,20 +32,30 @@ const Chat = ({ userId }: any) => {
   }, []);
 
   const listenSocketChannel = async () => {
-
     const socket = io(baseUrl);
 
-    socket.on('connect', () => console.log("connected"))
+    socket.on('connect', () => {
+      console.log('connected');
+      const currentUserId = currentUser?.id;
+      socket.emit('join', { user_id: currentUserId });
+    });
 
-    socket.on('disconnect', (message) => console.log("socket disconnected from server: ", message))
+    socket.on('disconnect', (message) => {
+      console.log('socket disconnected from server: ', message);
+    });
 
-    socket.on(`chat-message-${currentUser?.id}`, async (e: any) => setMessages((prev: any) => [e, ...prev]))
+    socket.on(`chat-message-${currentUser?.id}`, (e) => {
+      setMessages((prev) => [e, ...prev]);
+    });
 
-    socket.on(`delete-chat-message-${currentUser?.id}`, async (e: any) => setMessages((oldMessages: any) => oldMessages?.filter((message: any) => message?.id != e?.deletedMessageId)))
+    socket.on(`delete-chat-message-${currentUser?.id}`, (e) => {
+      setMessages((oldMessages) =>
+        oldMessages.filter((message) => message?.id !== e?.deletedMessageId)
+      );
+    });
 
-    return () => socket.close()
-
-  }
+    return () => socket.close();
+  };
 
   const getUserProfile = async (userId: string) => {
 
