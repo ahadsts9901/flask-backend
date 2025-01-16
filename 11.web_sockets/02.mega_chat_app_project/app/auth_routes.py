@@ -3,7 +3,7 @@ from .models import User
 import bcrypt
 import jwt
 from datetime import datetime, timedelta
-from config import JWT_KEY
+from config import JWT_KEY,default_profile_picture
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -42,14 +42,13 @@ def login():
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
     try:
-        if not request.form or not request.files:
-            return jsonify({'message': 'form data and file are required'}), 400
+        if not request.form:
+            return jsonify({'message': 'data is required'}), 400
 
         username = request.form.get('username')
         password = request.form.get('password')
-        profile_picture = request.files.get('file')
 
-        if not username or not password or not profile_picture:
+        if not username or not password:
             return jsonify({'message': 'all fields are required'}), 400
 
         if User.objects(username=username).first():
@@ -60,8 +59,7 @@ def signup():
         new_user = User(
             username=username,
             password=hashed_password,
-            role='user',  # Default role
-            profile_picture='profile_picture_url',  # For simplicity; you'd save the image
+            profile_picture=default_profile_picture,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow()
         )
