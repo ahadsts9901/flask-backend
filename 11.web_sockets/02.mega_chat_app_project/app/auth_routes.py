@@ -18,6 +18,10 @@ def google_login():
 
         access_token = data['access_token']
         google_user = request.get("https://www.googleapis.com/oauth2/v3/userinfo", { "headers": { "Authorization": f"Bearer {access_token}" }})
+        
+        if not all([google_user.data.name, google_user.data.email, google_user.data.picture]):
+                return jsonify({"message": "invalid google user data"}), 400
+        
         user = User.objects(email=google_user.data.email).first()
 
         if not user:
