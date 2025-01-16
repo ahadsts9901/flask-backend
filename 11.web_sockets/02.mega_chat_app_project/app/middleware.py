@@ -12,7 +12,6 @@ def jwt_required(f):
             return jsonify({'message': 'unauthorized'}), 401
 
         try:
-            # Corrected this line to use a list for the algorithms parameter
             payload = jwt.decode(token, JWT_KEY, algorithms=["HS256"])
             request.current_user = payload
         except jwt.ExpiredSignatureError as je:

@@ -17,4 +17,3 @@ def get_all_users():
     
     except Exception as e:
         return jsonify({"message": "internal server error", "error": str(e)}), 500
-

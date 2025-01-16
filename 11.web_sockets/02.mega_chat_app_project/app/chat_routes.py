@@ -111,7 +111,6 @@ def delete_message(message_id):
         message_id = str(message.id)
         message.delete()
 
-        # Emit delete event to the user (dynamic room)
         room = f'message-{message.to_id}'
         socketio.emit(f'delete-chat-message-{message.to_id}', {'deletedMessageId': message_id})
 

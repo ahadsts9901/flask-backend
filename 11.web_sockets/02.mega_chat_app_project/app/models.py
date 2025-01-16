@@ -18,8 +18,6 @@ class User(Document):
             "updated_at": self.updated_at
         }
 
-
-
 class Chat(Document):
     from_id = StringField(required=True)
     to_id = StringField(required=True)

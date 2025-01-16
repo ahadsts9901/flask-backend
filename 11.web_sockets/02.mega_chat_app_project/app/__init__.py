@@ -16,7 +16,6 @@ def create_app():
         raise ValueError("mongo_uri environment variable not set")
     connect("flask_chat_app", host=MONGO_URI)
 
-    # Register blueprints for different routes
     app.register_blueprint(auth_bp, url_prefix='/api/v1')
     app.register_blueprint(users_bp, url_prefix='/api/v1')
     app.register_blueprint(profile_bp, url_prefix='/api/v1')
