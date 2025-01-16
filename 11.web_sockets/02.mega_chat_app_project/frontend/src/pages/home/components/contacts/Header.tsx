@@ -137,7 +137,7 @@ const Header = ({ user, showDrop, showBackButton }: any) => {
                 <h3>
                     {
                         user?.id === currentUser?.id ? "You" :
-                            user?.userName ? user?.userName : "Chat App"
+                            user?.username ? user?.username : "Chat App"
                     }
                 </h3>
                 {showDrop && <LogoutDrop />}

@@ -18,7 +18,7 @@ const Contact = ({ user }: any) => {
                 <p>
                     {
                         currentUser?.id === user?.id ? "You" :
-                            user?.userName ? user?.userName : ""
+                            user?.username ? user?.username : ""
                     }
                 </p>
             </div>
