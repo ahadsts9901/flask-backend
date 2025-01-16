@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from .middleware import jwt_required
 from .models import User
 
-profile_bp = Blueprint('user', __name__)
+profile_bp = Blueprint('profile', __name__)
 
 # Get current user profile
 @profile_bp.route('/profile', methods=['GET'])
